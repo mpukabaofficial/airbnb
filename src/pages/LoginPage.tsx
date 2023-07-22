@@ -1,14 +1,18 @@
 import axios from "axios";
-import { FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useContext, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { UserContext } from "../UserContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  function handleLoginSubmit(event: FormEvent<HTMLFormElement>): void {
+  const [redirect, setRedirect] = useState(false);
+  const { setUser } = useContext(UserContext);
+
+  async function handleLoginSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
-      axios.post(
+      const { data } = await axios.post(
         "/login",
         {
           email,
@@ -16,10 +20,15 @@ const LoginPage = () => {
         },
         { withCredentials: true }
       );
+      setUser(data);
       alert("login successful");
+      setRedirect(true);
     } catch (error) {
       alert("login failed");
     }
+  }
+  if (redirect) {
+    return <Navigate to={"/"} />;
   }
 
   return (
