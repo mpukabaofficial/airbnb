@@ -9,6 +9,7 @@ type User = {
 type UserContextValue = {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  ready: boolean;
 };
 
 type UserContextProviderProps = {
@@ -18,17 +19,23 @@ type UserContextProviderProps = {
 export const UserContext = createContext<UserContextValue>({
   user: null,
   setUser: () => {},
+  ready: false,
 });
 
 export function UserContextProvider({ children }: UserContextProviderProps) {
   const [user, setUser] = useState<User | null>(null);
+  const [ready, setReady] = useState(false);
+
   useEffect(() => {
     if (!user) {
-      axios.get("/profile");
+      axios.get("/profile").then(({ data }) => {
+        setUser(data);
+        setReady(true);
+      });
     }
-  });
+  }, []);
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, ready }}>
       {children}
     </UserContext.Provider>
   );

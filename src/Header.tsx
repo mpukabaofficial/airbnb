@@ -8,7 +8,7 @@ const Header = () => {
     <div>
       {" "}
       <header className="flex justify-between">
-        <a href="" className="flex items-center gap-1 ">
+        <Link to={"/"} className="flex items-center gap-1 text-primary">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -24,15 +24,15 @@ const Header = () => {
             />
           </svg>
 
-          <span className="text-xl font-bold">airbnb</span>
-        </a>
+          <span className="hidden text-xl font-bold lg:block">airbnb</span>
+        </Link>
         <div className="flex gap-2 rounded-full border border-gray-300 px-4 py-2 shadow-md shadow-gray-300">
           <div>Anywhere</div>
           <div className="border border-l border-gray-300"></div>
           <div>Anyweek</div>
           <div className="border border-l border-gray-300"></div>
           <div>Add Guest</div>
-          <button className="rounded-full bg-primary p-1 text-white">
+          <button className="flex h-7 w-7 items-center justify-center rounded-full bg-primary p-1 text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -51,7 +51,7 @@ const Header = () => {
         </div>
         <Link
           className="flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 "
-          to={"/login"}
+          to={user ? "account" : "/login"}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +81,7 @@ const Header = () => {
               />
             </svg>
           </div>
-          {!!user && <div>user.name</div>}
+          {!!user && <div>{user.name}</div>}
         </Link>
       </header>
     </div>

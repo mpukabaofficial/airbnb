@@ -4,7 +4,8 @@
 
 input[type="email"],
 input[type="password"],
-input[type="text"] {
+input[type="text"],
+input[type="number"] {
   @apply my-1 w-full rounded-2xl border px-3 py-2;
 }
 button {
@@ -12,4 +13,11 @@ button {
 }
 button.primary {
   @apply w-full rounded-2xl bg-primary p-2 text-white;
+}
+
+h2.input-header {
+  @apply text-2xl;
+}
+h3.input-subheading {
+  @apply font-sans text-gray-500;
 }
