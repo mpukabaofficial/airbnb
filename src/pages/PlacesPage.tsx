@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 interface Address {
@@ -14,12 +15,15 @@ interface YourFormData {
   owner: string; // Assuming the owner is represented by a user ID as a string
   title: string;
   address: Address;
+  photoLink: string;
+  photoFile: File | null | undefined;
   photos: string[];
   description: string;
   perks: string[];
   extraInfo: string;
-  checkIn: number;
-  checkOut: number;
+  checkIn: string;
+  checkOut: string;
+  maxGuests: number;
 }
 
 const initialFormValues: YourFormData = {
@@ -33,12 +37,15 @@ const initialFormValues: YourFormData = {
     state: "",
     country: "",
   },
+  photoFile: null,
   photos: [],
   description: "",
   perks: [],
   extraInfo: "",
-  checkIn: 0,
-  checkOut: 0,
+  checkIn: "",
+  checkOut: "",
+  maxGuests: 0,
+  photoLink: "",
 };
 type PerkIcons = Record<string, JSX.Element>;
 
@@ -192,6 +199,22 @@ const PlacesPage = () => {
 
   const [perks, setPerks] = useState(perksData);
 
+  const [title, setTitle] = useState(initialFormValues.title);
+  const [address, setAddress] = useState(initialFormValues.address);
+  const [addedPhotos, setAddedPhotos] = useState<string[]>(
+    initialFormValues.photos
+  );
+  const [photoLink, setPhotoLink] = useState(initialFormValues.photoLink);
+  const [photoFile, setPhotoFile] = useState(initialFormValues.photoFile);
+  const [description, setDescription] = useState(initialFormValues.description);
+  const [perksValue, setPerksValue] = useState<string[]>(
+    initialFormValues.perks
+  );
+  const [extraInfo, setExtraInfo] = useState(initialFormValues.extraInfo);
+  const [checkIn, setCheckIn] = useState(initialFormValues.checkIn);
+  const [checkOut, setCheckOut] = useState(initialFormValues.checkOut);
+  const [maxGuests, setMaxGuests] = useState(initialFormValues.maxGuests);
+
   const handleCheckboxChange = (perkId: number) => {
     setPerks((prevPerks) =>
       prevPerks.map((perk) =>
@@ -208,6 +231,54 @@ const PlacesPage = () => {
       classes += " text-gray-300 ";
     }
     return classes;
+  }
+
+  const handleAddressChange = (event: { target: { value: any } }) => {
+    const newAddress = { ...address, street: event.target.value };
+    setAddress(newAddress);
+  };
+
+  const addPhotoByLink: React.MouseEventHandler<HTMLButtonElement> = async (
+    event
+  ) => {
+    event.preventDefault();
+    try {
+      const { data: filename } = await axios.post("/upload-by-link", {
+        link: photoLink,
+      });
+      setAddedPhotos((prev) => {
+        return [...prev, filename];
+      });
+    } catch (error) {
+      console.error("Error uploading photo:", error);
+    }
+    setPhotoLink("");
+  };
+
+  const handleMaxGuestsChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = parseInt(event.target.value, 10); // Parse the input value to an integer
+    setMaxGuests(value);
+  };
+
+  function uploadPhoto(event: any) {
+    const files = event.target.files;
+    const data = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      data.append("photos", files[i]);
+    }
+
+    axios
+      .post("/upload", data, {
+        headers: { "Content-type": "multipart/form-data" },
+      })
+      .then((response) => {
+        const { data: filenames } = response;
+        setAddedPhotos((prev) => {
+          return [...prev, ...filenames];
+        });
+      });
   }
 
   return (
@@ -246,7 +317,12 @@ const PlacesPage = () => {
           <h3 className="input-subheading">
             The title for your place should be short catchy
           </h3>
-          <input placeholder="Title here" type="text" name="title" />
+          <input
+            placeholder="Title here"
+            type="text"
+            name="title"
+            onChange={(event) => setTitle(event.target.value)}
+          />
 
           <div className="mt-8">
             <h2 className="input-header">Address</h2>
@@ -255,29 +331,85 @@ const PlacesPage = () => {
               placeholder="Street address"
               type="text"
               name="address.street"
+              value={address.street}
+              onChange={handleAddressChange}
             />
             <input
               placeholder="Apartment no, building, room, ..."
               type="text"
               name="address.specific"
+              value={address.specific}
+              onChange={handleAddressChange}
             />
 
-            <input placeholder="Town/City" type="text" name="address.city" />
-            <input placeholder="ZipCode" type="number" name="address.zipCode" />
-            <input placeholder="State" type="text" name="address.state" />
-            <input placeholder="Country" type="text" name="address.country" />
+            <input
+              placeholder="Town/City"
+              type="text"
+              name="address.city"
+              value={address.city}
+              onChange={handleAddressChange}
+            />
+            <input
+              placeholder="ZipCode"
+              type="number"
+              name="address.zipCode"
+              value={address.zipCode}
+              onChange={handleAddressChange}
+            />
+            <input
+              placeholder="State"
+              type="text"
+              name="address.state"
+              value={address.state}
+              onChange={handleAddressChange}
+            />
+            <input
+              placeholder="Country"
+              type="text"
+              name="address.country"
+              value={address.country}
+              onChange={handleAddressChange}
+            />
           </div>
           {/* photos */}
           <h2 className="input-header mt-8">Photos</h2>
           <h3 className="input-subheading">The more the better</h3>
           <div className="flex gap-2">
-            <input placeholder="Add using a link" type="text" name="photos" />
-            <button className="rounded-2xl bg-gray-200 px-4">
+            <input
+              placeholder="Add using a link"
+              type="text"
+              name="photos"
+              value={photoLink}
+              onChange={(e) => setPhotoLink(e.target.value)}
+            />
+            <button
+              className="rounded-2xl bg-gray-200 px-4"
+              onClick={addPhotoByLink}
+            >
               Add&nbsp;photo
             </button>
           </div>
-          <div className="mt-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            <button className="flex justify-center gap-1 rounded-2xl border bg-transparent p-4 text-2xl text-gray-600">
+
+          <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 ">
+            {setAddedPhotos.length > 0 &&
+              addedPhotos.map((link) => (
+                <div className="h-[150px] overflow-hidden rounded-2xl object-cover">
+                  <img
+                    src={"http://localhost:4000/uploads/" + link}
+                    alt=""
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            <label className="flex h-[150px] cursor-pointer items-center justify-center gap-1 rounded-2xl border bg-transparent p-4 text-2xl text-gray-600">
+              <input
+                type="file"
+                name="pictureFiles"
+                multiple
+                id=""
+                className="hidden"
+                onChange={uploadPhoto}
+              />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -293,7 +425,7 @@ const PlacesPage = () => {
                 />
               </svg>
               Upload
-            </button>
+            </label>
           </div>
 
           <div>
@@ -309,7 +441,7 @@ const PlacesPage = () => {
             <h3 className="input-subheading">
               Select all the perks of your place
             </h3>
-            <div className="my-4 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-6">
+            <div className="my-4 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
               {perks.map((perk) => (
                 <label key={perk.id} className={checked(perk.selected)}>
                   <input
@@ -328,17 +460,49 @@ const PlacesPage = () => {
           <div className="mt-8">
             <h2 className="input-header ">Extra Info</h2>
             <h3 className="input-subheading">House rules, conduct, etc</h3>
-            <textarea name="extraInfo" />
+            <textarea
+              name="extraInfo"
+              onChange={(event) => setExtraInfo(event.target.value)}
+            />
           </div>
 
-          <h2 className="input-header">Title</h2>
-          <h3 className="input-subheading">Subheading</h3>
-          <input placeholder="Title here" type="number" name="checkIn" />
+          <div className="mt-8">
+            <h2 className="input-header">Check in and check out times</h2>
+            <h3 className="input-subheading">Input check in time</h3>
+            <input
+              placeholder="1:00pm"
+              type="text"
+              name="checkIn"
+              onChange={(event) => setCheckIn(event.target.value)}
+            />
+            <h3 className="input-subheading">Input checkout time</h3>
+            <input
+              placeholder="1:00pm"
+              type="text"
+              name="checkOut"
+              onChange={(event) => setCheckOut(event.target.value)}
+            />
+          </div>
+          <div className="my-8">
+            <h2 className="input-header">Max guests</h2>
+            <h3 className="input-subheading">
+              What is the max capacity of your accomodation
+            </h3>
+            <input
+              placeholder="5 guests"
+              type="number"
+              name="maxGuests"
+              value={maxGuests || ""}
+              onChange={handleMaxGuestsChange}
+            />
+          </div>
 
-          <h2 className="input-header">Title</h2>
-          <h3 className="input-subheading">Subheading</h3>
-          <input placeholder="Title here" type="number" name="checkOut" />
-          <button type="submit">Submit</button>
+          <button
+            className="primary opacity-80 transition-all hover:opacity-100"
+            type="submit"
+          >
+            Submit
+          </button>
         </form>
       )}
     </div>
