@@ -4,15 +4,13 @@ import React, { useState } from "react";
 interface PhotosUploaderProps {
   addedPhotos: string[];
   onChange: (photos: string[]) => void;
-  initialValue: string;
 }
 
-const PhotosUploader = ({
+const PhotosUploader: React.FC<PhotosUploaderProps> = ({
   addedPhotos,
   onChange,
-  initialValue,
 }: PhotosUploaderProps) => {
-  const [photoLink, setPhotoLink] = useState(initialValue);
+  const [photoLink, setPhotoLink] = useState<string>("");
 
   function uploadPhoto(event: any) {
     const files = event.target.files;
