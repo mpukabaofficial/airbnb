@@ -67,7 +67,7 @@ const PlacesPage = () => {
             Add New Place
           </Link>
         </div>
-        <div className="mt-4">
+        <div className="m-auto mt-4 max-w-4xl">
           {places.length > 0 &&
             places.map((place) => (
               <Link

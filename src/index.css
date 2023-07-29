@@ -9,6 +9,9 @@ input[type="number"],
 textarea {
   @apply my-1 w-full rounded-2xl border px-3 py-2;
 }
+textarea {
+  @apply h-[150px];
+}
 button {
   @apply bg-gray-300;
 }

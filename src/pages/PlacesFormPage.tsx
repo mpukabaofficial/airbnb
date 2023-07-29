@@ -1,6 +1,6 @@
 import axios from "axios";
-import { ChangeEvent, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Navigate, useParams } from "react-router-dom";
 import { perksData, perkIcons } from "../Components/FormComponents/PerksData";
 import PhotosUploader from "../Components/FormComponents/PhotosUploader";
 import AccountNavigation from "../Components/AccountNavigation";
@@ -10,8 +10,8 @@ import {
 } from "../Components/Types/placesInterface";
 
 const PlacesFormPage = () => {
+  const { id } = useParams();
   const [perks, setPerks] = useState(perksData);
-
   const [title, setTitle] = useState(initialFormValues.title);
   const [address, setAddress] = useState(initialFormValues.address);
   const [addedPhotos, setAddedPhotos] = useState<string[]>(
@@ -26,10 +26,33 @@ const PlacesFormPage = () => {
   const [checkOut, setCheckOut] = useState(initialFormValues.checkOut);
   const [maxGuests, setMaxGuests] = useState(initialFormValues.maxGuests);
   const [redirect, setRedirect] = useState<boolean>(false);
+  useEffect(() => {
+    if (id === undefined) return;
+    axios.get("/places/" + id).then((response) => {
+      const { data } = response;
+      setTitle(data.title);
+      setAddress((prevAddress) => ({
+        ...prevAddress,
+        street: data.address.street,
+        specific: data.address.specific,
+        zipCode: data.address.zipCode,
+        city: data.address.city,
+        state: data.address.state,
+        country: data.address.country,
+      }));
+      setAddedPhotos([...addedPhotos, ...data.photos]);
+      setDescription(data.description);
+      setPerksValue(data.perks);
+      setExtraInfo(data.extraInfo);
+      setCheckIn(data.checkIn);
+      setCheckOut(data.checkOut);
+      setMaxGuests(data.maxGuests);
+    });
+  }, [id]);
 
-  async function addNewPlace(event: React.FormEvent<HTMLFormElement>) {
+  async function savePlace(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await axios.post("/places", {
+    const formData = {
       title,
       address,
       addedPhotos,
@@ -39,7 +62,16 @@ const PlacesFormPage = () => {
       checkIn,
       checkOut,
       maxGuests,
-    });
+    };
+    if (id) {
+      await axios.put("/places/", {
+        id,
+        ...formData,
+      });
+    } else {
+      await axios.post("/places", { ...formData });
+    }
+
     setRedirect(true);
   }
 
@@ -92,7 +124,7 @@ const PlacesFormPage = () => {
   return (
     <div>
       <AccountNavigation />
-      <form onSubmit={addNewPlace} className="mx-auto my-10 max-w-2xl">
+      <form onSubmit={savePlace} className="mx-auto my-10 max-w-2xl">
         <h2 className="input-header">Title</h2>
         <h3 className="input-subheading">
           The title for your place should be short catchy
@@ -175,11 +207,14 @@ const PlacesFormPage = () => {
           </h3>
           <div className="my-4 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
             {perks.map((perk) => (
-              <label key={perk.id} className={checked(perk.selected)}>
+              <label
+                key={perk.id}
+                className={checked(perksValue.includes(perk.name))}
+              >
                 <input
                   type="checkbox"
                   name={perk.name}
-                  checked={perk.selected}
+                  checked={perksValue.includes(perk.name)}
                   onChange={(event) => {
                     handleCheckboxChange(perk.id);
                     selectedPerks(event);
