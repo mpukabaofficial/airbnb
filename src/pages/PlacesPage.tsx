@@ -2,43 +2,16 @@ import { Link } from "react-router-dom";
 import AccountNavigation from "../Components/AccountNavigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
-
-interface Address {
-  street: string;
-  specific: string;
-  zipCode: number;
-  city: string;
-  state: string;
-  country: string;
-}
-interface Places {
-  _id: number;
-  title: string;
-  address: Address;
-  description: string;
-  perks: string[];
-  extraInfo: string;
-  checkIn: string;
-  checkOut: string;
-  maxGuests: number;
-  photos: string[];
-}
+import { Places } from "../Components/Types/placesInterface";
 
 const PlacesPage = () => {
   const [places, setPlaces] = useState<Places[]>([]);
   const path = "http://localhost:4000/uploads/";
   useEffect(() => {
-    axios.get("/places").then(({ data }) => {
+    axios.get("/user-places").then(({ data }) => {
       setPlaces(data);
     });
   }, []);
-  function getRandomIndex(number: number) {
-    return Math.floor(Math.random() * number);
-  }
-  function randomPicture(pictureIndex: number): number {
-    const randomIndex = getRandomIndex(pictureIndex);
-    return randomIndex;
-  }
 
   return (
     <div>
@@ -73,14 +46,12 @@ const PlacesPage = () => {
               <Link
                 to={"/account/places/" + place._id}
                 key={place._id}
-                className="flex gap-4 rounded-2xl bg-gray-200 p-4"
+                className="my-2 flex gap-4 rounded-2xl bg-gray-100 p-4 hover:bg-gray-200"
               >
                 <div className="h-32 w-32 shrink-0 overflow-hidden rounded-lg bg-gray-300">
                   <img
                     className="h-full w-full object-cover"
-                    src={
-                      path + place.photos[randomPicture(place.photos.length)]
-                    }
+                    src={path + place.photos[0]}
                     alt=""
                   />
                 </div>

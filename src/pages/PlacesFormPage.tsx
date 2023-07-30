@@ -26,6 +26,7 @@ const PlacesFormPage = () => {
   const [checkOut, setCheckOut] = useState(initialFormValues.checkOut);
   const [maxGuests, setMaxGuests] = useState(initialFormValues.maxGuests);
   const [redirect, setRedirect] = useState<boolean>(false);
+  const [price, setPrice] = useState(initialFormValues.price);
   useEffect(() => {
     if (id === undefined) return;
     axios.get("/places/" + id).then((response) => {
@@ -47,6 +48,7 @@ const PlacesFormPage = () => {
       setCheckIn(data.checkIn);
       setCheckOut(data.checkOut);
       setMaxGuests(data.maxGuests);
+      setPrice(data.price);
     });
   }, [id]);
 
@@ -62,6 +64,7 @@ const PlacesFormPage = () => {
       checkIn,
       checkOut,
       maxGuests,
+      price,
     };
     if (id) {
       await axios.put("/places/", {
@@ -268,6 +271,19 @@ const PlacesFormPage = () => {
             name="maxGuests"
             value={maxGuests || ""}
             onChange={handleMaxGuestsChange}
+          />
+        </div>
+        <div className="my-8">
+          <h2 className="input-header">Price per night</h2>
+          <h3 className="input-subheading">
+            What it costs the guest to stay for a night, in dollars
+          </h3>
+          <input
+            placeholder="120"
+            type="text"
+            name="price"
+            value={price}
+            onChange={(event) => setPrice(event.target.value)}
           />
         </div>
 

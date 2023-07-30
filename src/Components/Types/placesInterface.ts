@@ -16,6 +16,7 @@ export interface PlacesData {
   checkOut: string;
   maxGuests: number;
   addedPhotos: string[];
+  price: string;
 }
 
 export const initialAddress: Address = {
@@ -37,4 +38,19 @@ export const initialFormValues: PlacesData = {
   maxGuests: 0,
   perksValue: [],
   addedPhotos: [],
+  price: "",
 };
+
+export interface Places {
+  _id?: number;
+  title: string;
+  address: Address;
+  description: string;
+  perks: string[];
+  extraInfo: string;
+  checkIn: string;
+  checkOut: string;
+  maxGuests: number;
+  photos: string[];
+  price: string;
+}

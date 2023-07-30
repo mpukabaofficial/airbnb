@@ -18,7 +18,6 @@ const LoginPage = () => {
         email,
         password,
       });
-      console.log(data);
       setUser(data);
       alert("login successful");
       setRedirect(true);
