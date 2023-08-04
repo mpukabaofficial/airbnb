@@ -6,7 +6,9 @@ input[type="email"],
 input[type="password"],
 input[type="text"],
 input[type="number"],
-textarea {
+input[type="tel"],
+textarea,
+select {
   @apply my-1 w-full rounded-2xl border px-3 py-2;
 }
 textarea {

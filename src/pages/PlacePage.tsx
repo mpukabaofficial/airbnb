@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { Places } from "../Components/Types/placesInterface";
 import { perkIcons } from "../Components/FormComponents/PerksData";
+import BookingWidget from "../Components/BookingWidget";
 
 const PlacePage = () => {
   const { id } = useParams();
@@ -54,7 +55,7 @@ const PlacePage = () => {
 
   if (showPhoto) {
     return (
-      <div className="absolute left-0 top-0 z-50 flex h-screen w-full items-center justify-center bg-black bg-opacity-80 p-40 backdrop-blur-2xl transition-all">
+      <div className="absolute left-0 top-0 z-50 flex h-screen w-full items-center justify-center bg-black bg-opacity-80 backdrop-blur-2xl transition-all md:p-40">
         <img src={path + showingPhoto} alt="" />
         <button
           onClick={() => setShowPhoto(false)}
@@ -81,7 +82,7 @@ const PlacePage = () => {
 
   if (showPhotos) {
     return (
-      <div className="absolute left-0 top-0 z-20 block h-screen w-full bg-white bg-opacity-80 p-40 backdrop-blur-2xl transition-all">
+      <div className="absolute left-0 top-0 z-20 block h-screen w-full bg-white bg-opacity-80 p-4 backdrop-blur-2xl transition-all md:p-40">
         <div className="m-auto max-w-[1024px]">
           <h1 className="mb-4 text-3xl">{"Pictures of " + place.title}</h1>
           <div className="  m-auto grid grid-cols-2 gap-2">
@@ -128,7 +129,7 @@ const PlacePage = () => {
   }
 
   return (
-    <div className="py m-auto mt-4 flex max-w-[1024px] flex-col gap-8 px-8 py-6 transition-all">
+    <div className="py m-auto mt-4 flex max-w-[1024px] flex-col gap-8 py-6 transition-all sm:px-8">
       <div>
         <h1 className="text-3xl">{place.title}</h1>
         <a
@@ -192,29 +193,39 @@ const PlacePage = () => {
           Show more photos
         </button>
       </div>
-      <div className=" border-b px-8 pb-8">
-        <h2 className="mb-2 text-2xl font-semibold">Check in and check out</h2>
-        <div className="grid max-w-[400px] grid-cols-2">
-          <div className="flex gap-1">
-            <p>Check-in:</p>
-            <p>{place.checkIn}</p>
-          </div>
-          <div className="flex gap-1">
-            <p>Check-out:</p>
-            <p>{place.checkOut}</p>
+
+      <div className=" grid border-b pb-8 sm:px-8 lg:grid-cols-[10fr,9fr]">
+        <div className="">
+          <h2 className="mb-2 text-2xl font-semibold">
+            Check in and check out
+          </h2>
+          <div className="grid max-w-[400px] grid-cols-1 md:grid-cols-2">
+            <div className="flex gap-1">
+              <p className="font-semibold">Check-in:</p>
+              <p>{place.checkIn}</p>
+            </div>
+            <div className="flex gap-1">
+              <p className="font-semibold">Check-out:</p>
+              <p>{place.checkOut}</p>
+            </div>
+            <div className="flex gap-1">
+              <p className="font-semibold">Max-Guests:</p>
+              <p>{place.maxGuests + " guests"}</p>
+            </div>
           </div>
         </div>
+        <BookingWidget {...place} />
       </div>
-      <div className="border-b px-8 pb-8">
+      <div className="border-b pb-8 sm:px-8">
         <h2 className="mb-2 text-2xl font-semibold">Description</h2>
         <p className="text-gray-600">{place.description}</p>
       </div>
-      <div className="border-b px-8 pb-8">
+      <div className="border-b pb-8 sm:px-8">
         {place.perks.map((perk) => (
           <div>{createPerks(perk)}</div>
         ))}
       </div>
-      <div className="border-b px-8 pb-8">
+      <div className="border-b pb-8 sm:px-8">
         <h2 className="mb-2 text-2xl font-semibold">Extra Info</h2>
         <p className="text-gray-600">{place.extraInfo}</p>
       </div>
