@@ -42,7 +42,7 @@ export const initialFormValues: PlacesData = {
 };
 
 export interface Places {
-  _id?: number;
+  _id?: string;
   title: string;
   address: Address;
   description: string;
